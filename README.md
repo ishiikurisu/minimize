@@ -1,3 +1,3 @@
 # Minimize
 
-Turn whole Lua systems into a unique script.
+Turn whole Lua systems into a single script.
