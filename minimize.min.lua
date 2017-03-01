@@ -60,13 +60,11 @@ minimizer.buildRequires = function(references)
   return references
 end
 -- Writes to the outlet file the corrected contents of the inlet file
-minimizer.writeFileCorrectly = function(outlet, inlet, added)
+minimizer.writeFileCorrectly = function(outlet, inlet, conditionOperation)
   local line = inlet:read()
   while line ~= nil do
     -- TODO Check if the line has a return statement in the beginning
-    local isRequire = string.find(line, '= require')
-    local isReturn = util.match(line, 'return ')
-    if (result == nil) and (isReturn == false) then
+    if conditionOperation(line) then
       outlet:write(line .. "\n")
     end
     line = inlet:read()
@@ -85,10 +83,15 @@ minimizer.buildMainScript = function(input, refs, output)
   -- TODO Write files
   for i = limit, 1, -1 do
     local ref = refs[i]
+    -- TODO Check repeated files
     local fref, errorRef = io.open(ref .. ".lua")
     if errorRef == nil then
       added[ref] = true
-      minimizer.writeFileCorrectly(fp, fref, added)
+      minimizer.writeFileCorrectly(fp, fref, function(line)
+        local isRequire = string.find(line, '= require')
+        local isReturn = util.match(line, 'return ')
+        return (result == nil) and (isReturn == false)
+      end)
       fref:close()
     end
   end
