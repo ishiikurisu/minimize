@@ -24,7 +24,7 @@ minimizer.identifyRequires = function(fileName, references)
 
   local line = fp:read()
   while line ~= nil do
-    local result = string.find(line, '= require')
+    local result = string.find(line, '= ' .. 'require')
     if result ~= nil then
       local required = line:sub(result+11, #line-1)
       table.insert(references, required)
@@ -89,7 +89,7 @@ minimizer.buildMainScript = function(input, refs, output)
     if errorRef == nil then
       added[ref] = true
       minimizer.writeFileCorrectly(fp, fref, function(line)
-        local isRequire = string.find(line, '= require')
+        local isRequire = string.find(line, '= ' .. 'require')
         local isReturn = util.match(line, 'return ')
         return (isRequire == nil) and (isReturn == false)
       end)
@@ -99,7 +99,7 @@ minimizer.buildMainScript = function(input, refs, output)
   -- TODO Write input file
   local fin, _ = io.open(input)
   minimizer.writeFileCorrectly(fp, fin, function(line)
-    local isRequire = string.find(line, '= require')
+    local isRequire = string.find(line, '= ' .. 'require')
     return isRequire == nil
   end)
   fin:close()
