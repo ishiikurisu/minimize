@@ -24,7 +24,6 @@ minimizer.identifyRequires = function(fileName, references)
 
   local line = fp:read()
   while line ~= nil do
-    -- TODO Identify lines with requires
     local result = string.find(line, '= require')
     if result ~= nil then
       local required = line:sub(result+11, #line-1)
@@ -63,7 +62,6 @@ minimizer.writeFileCorrectly = function(outlet, inlet, conditionOperation)
   local line = inlet:read()
 
   while line ~= nil do
-    -- TODO Check if the line has a return statement in the beginning
     if conditionOperation(line) then
       outlet:write(line .. "\n")
     end
@@ -116,17 +114,12 @@ minimizer.minimize = function(input)
   print("output: " .. output)
   local references = { }
 
-  -- # Scanning main file
   references = minimizer.identifyRequires(input, references)
-
-  -- # Scanning every file in reference until there are no more files
   references = minimizer.buildRequires(references)
   print("references:")
   for _, ref in pairs(references) do
     print("- " .. ref)
   end
-
-  -- TODO Build main script
   minimizer.buildMainScript(input, references, output)
 end
 
