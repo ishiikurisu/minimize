@@ -86,7 +86,7 @@ minimizer.buildMainScript = function(input, refs, output)
     local ref = refs[i]
     -- TODO Check repeated files
     local fref, errorRef = io.open(ref .. ".lua")
-    if errorRef == nil then
+    if (errorRef == nil) and (added[ref] ~= true) then
       added[ref] = true
       minimizer.writeFileCorrectly(fp, fref, function(line)
         local isRequire = string.find(line, '= ' .. 'require')
