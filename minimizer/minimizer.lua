@@ -63,6 +63,10 @@ minimizer.writeFileCorrectly = function(outlet, inlet, added)
 
   while line ~= nil do
     -- TODO Check if the line has a require statement
+    local result = string.find(line, '= require')
+    if result == nil then
+      outlet:write(line .. "\n")
+    end
     -- TODO Check if the line has a return statement in the beginning
     line = inlet:read()
   end
@@ -81,11 +85,11 @@ minimizer.buildMainScript = function(input, refs, output)
 
   -- TODO Write files
   for _, ref in ipairs(refs) do
-    local fref, errorRef = io.open(ref)
+    local fref, errorRef = io.open(ref .. ".lua")
     if errorRef == nil then
       added[ref] = true
       minimizer.writeFileCorrectly(fp, fref, added)
-      fpTemp:close()
+      fref:close()
     end
   end
   -- TODO Write input file
