@@ -1,0 +1,2 @@
+#!/bin/sh
+lua ~/Documents/code/minimize/minimize.min.lua $@

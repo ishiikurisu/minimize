@@ -29,7 +29,6 @@ minimizer.identifyRequires = function(fileName, references)
   end
   local line = fp:read()
   while line ~= nil do
-    -- TODO Identify lines with requires
     if result ~= nil then
       local required = line:sub(result+11, #line-1)
       table.insert(references, required)
@@ -61,7 +60,6 @@ end
 minimizer.writeFileCorrectly = function(outlet, inlet, conditionOperation)
   local line = inlet:read()
   while line ~= nil do
-    -- TODO Check if the line has a return statement in the beginning
     if conditionOperation(line) then
       outlet:write(line .. "\n")
     end
@@ -106,26 +104,19 @@ minimizer.minimize = function(input)
   local output = minimizer.changeExtension(input, '.min.lua')
   print("output: " .. output)
   local references = { }
-  -- # Scanning main file
   references = minimizer.identifyRequires(input, references)
-  -- # Scanning every file in reference until there are no more files
   references = minimizer.buildRequires(references)
   print("references:")
   for _, ref in pairs(references) do
     print("- " .. ref)
   end
-  -- TODO Build main script
   minimizer.buildMainScript(input, references, output)
 end
 
 -- MAIN FUNCTIONS
 if #arg > 0 then
-  -- Debugging args
-  for k, v in pairs(arg) do
-    print(k .. ": " .. v)
-  end
   -- Checking if it should run this script on terminal mode
-  if (arg[0] == "minimize.lua") or (arg[0] == "minimizer.min.lua") then
+  if string.find(arg[0], 'mini') then
     minimizer.minimize(arg[1])
   end
 end
