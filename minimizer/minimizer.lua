@@ -1,3 +1,4 @@
+local util = require "minimizer/util"
 local minimizer = { }
 
 -- Creates a new extension for the given input file name
@@ -76,6 +77,7 @@ end
 minimizer.buildMainScript = function(input, refs, output)
   local fp, error = io.open(output, "w")
   local added = { }
+  local limit = #refs
 
   -- Checking for output errors
   if error ~= nil then
@@ -84,7 +86,8 @@ minimizer.buildMainScript = function(input, refs, output)
   end
 
   -- TODO Write files
-  for _, ref in ipairs(refs) do
+  for i = limit, 1, -1 do
+    local ref = refs[i]
     local fref, errorRef = io.open(ref .. ".lua")
     if errorRef == nil then
       added[ref] = true
