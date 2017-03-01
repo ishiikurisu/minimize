@@ -1,5 +1,6 @@
 local minimizer = { }
 
+-- Creates a new extension for the given input file name
 minimizer.changeExtension = function(input, newExt)
   local index = #input
 
@@ -11,10 +12,16 @@ minimizer.changeExtension = function(input, newExt)
   return root .. newExt
 end
 
+-- Discover which requires are done in the source code in file name
 minimizer.identifyRequires = function(fileName, references)
   local fp, error = io.open(fileName)
 
-  line = fp:read()
+  if error ~= nil then
+    print("OOPS: " .. error)
+    return references
+  end
+
+  local line = fp:read()
   while line ~= nil do
     -- TODO Identify lines with requires
     local result = string.find(line, '= require')
@@ -29,6 +36,7 @@ minimizer.identifyRequires = function(fileName, references)
   return references
 end
 
+-- The main minimizer function
 minimizer.minimize = function(input)
   print("input: " .. input)
   local output = minimizer.changeExtension(input, '.min.lua')
@@ -36,14 +44,9 @@ minimizer.minimize = function(input)
   local references = { }
 
   -- # Scanning main file
-  print(input .. " requires:")
   references = minimizer.identifyRequires(input, references)
-  for _, v in pairs(references) do
-    print("- " .. v)
-  end
-  print("...")
 
-  -- TODO Scan every file in reference until there are no more files
+  -- # Scanning every file in reference until there are no more files
   local flag = true
   local added = { }
 
@@ -61,6 +64,12 @@ minimizer.minimize = function(input)
       end
     end
   end
+  print("references:")
+  for _, ref in pairs(references) do
+    print("- " .. ref)
+  end
+
+  -- TODO Build main script
 end
 
 return minimizer
