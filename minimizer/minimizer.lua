@@ -63,12 +63,12 @@ minimizer.writeFileCorrectly = function(outlet, inlet, added)
   local line = inlet:read()
 
   while line ~= nil do
-    -- TODO Check if the line has a require statement
-    local result = string.find(line, '= require')
-    if result == nil then
+    -- TODO Check if the line has a return statement in the beginning
+    local isRequire = string.find(line, '= require')
+    local isReturn = util.match(line, 'return ')
+    if (result == nil) and (isReturn == false) then
       outlet:write(line .. "\n")
     end
-    -- TODO Check if the line has a return statement in the beginning
     line = inlet:read()
   end
 end
