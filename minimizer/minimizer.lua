@@ -17,7 +17,7 @@ minimizer.identifyRequires = function(fileName, references)
   local fp, error = io.open(fileName)
 
   if error ~= nil then
-    print("OOPS: " .. error)
+    print("# BUG: " .. error)
     return references
   end
 
@@ -36,6 +36,31 @@ minimizer.identifyRequires = function(fileName, references)
   return references
 end
 
+-- Builds the references from all files based on the first requires
+minimizer.buildRequires = function(references)
+  local flag = true
+  local added = { }
+
+  -- The flag will turn into true when there are new added files
+  while flag do
+    local tempRefs = references
+    flag = false
+    for _, reference in pairs(tempRefs) do
+      if added[reference] ~= true then
+        added[reference] = true
+        flag = true
+        references = minimizer.identifyRequires(reference .. ".lua", references)
+      end
+    end
+  end
+
+  return references
+end
+
+-- Builds the main script
+minimizer.buildMainScript = function(input, refs, output)
+end
+
 -- The main minimizer function
 minimizer.minimize = function(input)
   print("input: " .. input)
@@ -47,29 +72,14 @@ minimizer.minimize = function(input)
   references = minimizer.identifyRequires(input, references)
 
   -- # Scanning every file in reference until there are no more files
-  local flag = true
-  local added = { }
-
-  -- The flag will turn into true when there are new added files
-  while flag do
-    local tempRefs = references
-    flag = false
-    for _, reference in pairs(tempRefs) do
-      if added[reference] ~= true then
-        print(reference .. ".lua")
-        added[reference] = true
-        flag = true
-        -- TODO Discover why this file can't be opened
-        references = minimizer.identifyRequires(reference .. ".lua", references)
-      end
-    end
-  end
+  references = minimizer.buildRequires(references)
   print("references:")
   for _, ref in pairs(references) do
     print("- " .. ref)
   end
 
   -- TODO Build main script
+  minimizer.buildMainScript(input, references, output)
 end
 
 return minimizer
