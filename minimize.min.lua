@@ -10,7 +10,6 @@ util.match = function(s, t)
   end
   return result
 end
-local util = require "minimizer/util"
 local minimizer = { }
 -- Creates a new extension for the given input file name
 minimizer.changeExtension = function(input, newExt)
@@ -31,7 +30,6 @@ minimizer.identifyRequires = function(fileName, references)
   local line = fp:read()
   while line ~= nil do
     -- TODO Identify lines with requires
-    local result = string.find(line, '= require')
     if result ~= nil then
       local required = line:sub(result+11, #line-1)
       table.insert(references, required)
@@ -88,14 +86,18 @@ minimizer.buildMainScript = function(input, refs, output)
     if errorRef == nil then
       added[ref] = true
       minimizer.writeFileCorrectly(fp, fref, function(line)
-        local isRequire = string.find(line, '= require')
         local isReturn = util.match(line, 'return ')
-        return (result == nil) and (isReturn == false)
+        return (isRequire == nil) and (isReturn == false)
       end)
       fref:close()
     end
   end
   -- TODO Write input file
+  local fin, _ = io.open(input)
+  minimizer.writeFileCorrectly(fp, fin, function(line)
+    return isRequire == nil
+  end)
+  fin:close()
   fp:close()
 end
 -- The main minimizer function
@@ -115,3 +117,17 @@ minimizer.minimize = function(input)
   -- TODO Build main script
   minimizer.buildMainScript(input, references, output)
 end
+
+-- MAIN FUNCTIONS
+if #arg > 0 then
+  -- Debugging args
+  for k, v in pairs(arg) do
+    print(k .. ": " .. v)
+  end
+  -- Checking if it should run this script on terminal mode
+  if (arg[0] == "minimize.lua") or (arg[0] == "minimizer.min.lua") then
+    minimizer.minimize(arg[1])
+  end
+end
+
+return minimizer

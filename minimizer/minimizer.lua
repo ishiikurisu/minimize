@@ -93,12 +93,18 @@ minimizer.buildMainScript = function(input, refs, output)
       minimizer.writeFileCorrectly(fp, fref, function(line)
         local isRequire = string.find(line, '= require')
         local isReturn = util.match(line, 'return ')
-        return (result == nil) and (isReturn == false)
+        return (isRequire == nil) and (isReturn == false)
       end)
       fref:close()
     end
   end
   -- TODO Write input file
+  local fin, _ = io.open(input)
+  minimizer.writeFileCorrectly(fp, fin, function(line)
+    local isRequire = string.find(line, '= require')
+    return isRequire == nil
+  end)
+  fin:close()
 
   fp:close()
 end
