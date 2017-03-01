@@ -57,8 +57,40 @@ minimizer.buildRequires = function(references)
   return references
 end
 
+-- Writes to the outlet file the corrected contents of the inlet file
+minimizer.writeFileCorrectly = function(outlet, inlet, added)
+  local line = inlet:read()
+
+  while line ~= nil do
+    -- TODO Check if the line has a require statement
+    -- TODO Check if the line has a return statement in the beginning
+    line = inlet:read()
+  end
+end
+
 -- Builds the main script
 minimizer.buildMainScript = function(input, refs, output)
+  local fp, error = io.open(output, "w")
+  local added = { }
+
+  -- Checking for output errors
+  if error ~= nil then
+    print("# BUG: " .. error)
+    return
+  end
+
+  -- TODO Write files
+  for _, ref in ipairs(refs) do
+    local fref, errorRef = io.open(ref)
+    if errorRef == nil then
+      added[ref] = true
+      minimizer.writeFileCorrectly(fp, fref, added)
+      fpTemp:close()
+    end
+  end
+  -- TODO Write input file
+
+  fp:close()
 end
 
 -- The main minimizer function
